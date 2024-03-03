@@ -15,6 +15,7 @@ import (
 	"github.com/nukahaha/car_store/src/internal/service"
 )
 
+// pussy
 func main() {
 	appConfiguration, err := configuration.NewConfiguration()
 	if err != nil {
