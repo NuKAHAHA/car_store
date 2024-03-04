@@ -86,6 +86,7 @@ func initAPI(appConfiguration *configuration.Configuration, engine *gin.Engine, 
 }
 
 // zhani
+// zhani
 func setDatabaseConnection(appConfiguration *configuration.Configuration) (*repository.Database, error) {
 	database, err := repository.NewDatabase(appConfiguration.DatabaseConfiguration)
 
