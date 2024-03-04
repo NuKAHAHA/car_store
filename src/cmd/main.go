@@ -85,6 +85,7 @@ func initAPI(appConfiguration *configuration.Configuration, engine *gin.Engine, 
 	return nil
 }
 
+// zhani
 func setDatabaseConnection(appConfiguration *configuration.Configuration) (*repository.Database, error) {
 	database, err := repository.NewDatabase(appConfiguration.DatabaseConfiguration)
 
@@ -98,6 +99,3 @@ func setDatabaseConnection(appConfiguration *configuration.Configuration) (*repo
 func setSession(appConfiguration *configuration.Configuration) gin.HandlerFunc {
 	return sessions.Sessions("some.session", sessions.NewCookieStore([]byte(*appConfiguration.SessionConfiguration.Secret)))
 }
-
-// zhani
-//)
