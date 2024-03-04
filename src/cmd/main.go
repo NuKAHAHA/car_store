@@ -98,3 +98,5 @@ func setDatabaseConnection(appConfiguration *configuration.Configuration) (*repo
 func setSession(appConfiguration *configuration.Configuration) gin.HandlerFunc {
 	return sessions.Sessions("some.session", sessions.NewCookieStore([]byte(*appConfiguration.SessionConfiguration.Secret)))
 }
+
+// zhani
