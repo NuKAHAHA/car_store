@@ -70,13 +70,13 @@ func initAPI(appConfiguration *configuration.Configuration, engine *gin.Engine, 
 	// Create Services
 	authService := service.NewAuthService(userRepository)
 	wishlistService := service.NewWishlistService(wishlistRepository, carRepository)
-	carService := service.NewCarService(carRepository)
+	carService := service.NewCarService(carRepository, userRepository)
 
 	// Create Controllers
 	homeController := controller.NewHomeController()
 	authController := controller.NewAuthController(authService)
 	wishlistController := controller.NewWishlistController(wishlistService)
-	carController := controller.NewCarController(carService)
+	carController := controller.NewCarController(carService, authService)
 
 	// Middlewares
 	engine.Use(setSession(appConfiguration))
@@ -94,16 +94,20 @@ func initAPI(appConfiguration *configuration.Configuration, engine *gin.Engine, 
 	authorized.GET("/logout", authController.GetLogout)
 
 	authorized.GET("/cars", carController.GetAllCars)
-	authorized.POST("/cars", carController.PostCar)
+
+	authorized.GET("/cars_post", carController.PostCarPage)
+	authorized.POST("/cars_post", carController.PostCar)
 
 	authorized.GET("/cars/:id/edit", carController.GetCarByID)
 	authorized.POST("/cars/:id/edit", carController.UpdateCar)
 	authorized.POST("/cars/:id/delete", carController.DeleteCar)
 
+	authorized.GET("/profile", carController.CarsPageHandler)
+
 	wishlistGroup := authorized.Group("/wishlist")
 	{
 		wishlistGroup.POST("/:userID/add/:carID", wishlistController.AddToWishlistHandler)
-		wishlistGroup.DELETE("/:userID/remove/:carID", wishlistController.RemoveFromWishlistHandler)
+		wishlistGroup.POST("/:userID/remove/:carID", wishlistController.RemoveFromWishlistHandler)
 		wishlistGroup.GET("", wishlistController.GetWishlistHandler)
 	}
 	return nil

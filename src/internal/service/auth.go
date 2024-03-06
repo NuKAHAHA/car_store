@@ -66,3 +66,15 @@ func (as *AuthService) Register(registerRequest *request.RegisterRequest) error 
 
 	return nil
 }
+
+func (as *AuthService) GetByFieldMail(email string) (*model.User, error) {
+	return as.UserRepository.GetByFieldMail(email)
+}
+func (as *AuthService) GetUserIDByEmail(email string) (string, error) {
+	user, err := as.UserRepository.GetByFieldMail(email)
+	if err != nil {
+		return "", err
+	}
+
+	return user.ID.Hex(), nil
+}

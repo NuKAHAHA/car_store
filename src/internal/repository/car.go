@@ -44,6 +44,23 @@ func (cr *CarRepository) GetAllCars() ([]model.Car, error) {
 	log.Println("Fetched cars from the database:", cars)
 	return cars, nil
 }
+func (cr *CarRepository) PostCarPage() ([]model.Car, error) {
+	var cars []model.Car
+	cursor, err := cr.Collection.Find(context.Background(), bson.M{})
+	if err != nil {
+		log.Println("Error fetching cars from the database:", err)
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+
+	if err := cursor.All(context.Background(), &cars); err != nil {
+		log.Println("Error decoding cars:", err)
+		return nil, err
+	}
+
+	log.Println("Fetched cars from the database:", cars)
+	return cars, nil
+}
 func (cr *CarRepository) GetCarsSortedByYear() ([]model.Car, error) {
 	var cars []model.Car
 	opts := options.Find().SetSort(bson.D{{Key: "year", Value: -1}})
@@ -129,4 +146,23 @@ func (cr *CarRepository) DeleteCar(carID string) error {
 	}
 
 	return nil
+}
+func (r *CarRepository) GetCarsByUserID(userID string) ([]model.Car, error) {
+	filter := bson.M{"user_id": userID}
+	cursor, err := r.Collection.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(context.TODO())
+
+	var cars []model.Car
+	for cursor.Next(context.TODO()) {
+		var car model.Car
+		if err := cursor.Decode(&car); err != nil {
+			return nil, err
+		}
+		cars = append(cars, car)
+	}
+
+	return cars, nil
 }

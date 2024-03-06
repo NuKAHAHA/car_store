@@ -126,7 +126,7 @@ func (ac *AuthController) PostRegister(ctx *gin.Context) {
 		Surname:         ctx.PostForm("surname"),
 	}
 
-	ctx.BindWith(registerRequest, binding.FormPost)
+	ctx.MustBindWith(registerRequest, binding.FormPost)
 
 	var err error
 	registerRequest.Birthday, err = time.Parse("2006-01-02", ctx.PostForm("birthday"))
@@ -166,14 +166,41 @@ func GetUserID(ctx *gin.Context) (string, error) {
 	session := sessions.Default(ctx)
 	userID := session.Get(configuration.SessionKeyUser)
 	if userID == nil {
-		return "0", errors.New("user ID not found in session")
+		return "", errors.New("user ID not found in session")
 	}
 
-	// Преобразуем userID в uint
-	userIDUint, ok := userID.(string)
+	// Преобразование userID в строку
+	userIDStr, ok := userID.(string)
 	if !ok {
-		return "0", errors.New("user ID in session is not of type uint")
+		fmt.Printf("UserID in session is not of type string: %v\n", userID)
+		return "", errors.New("user ID in session is not of type string")
 	}
 
-	return userIDUint, nil
+	return userIDStr, nil
+}
+func GetUserIDI(ctx *gin.Context) (interface{}, error) {
+	session := sessions.Default(ctx)
+	userID := session.Get(configuration.SessionKeyUser)
+	if userID == nil {
+		return nil, errors.New("user ID not found in session")
+	}
+
+	// Преобразуем userID в интерфейс
+	return userID, nil
+}
+
+func GetUserEmail(ctx *gin.Context) (string, error) {
+	session := sessions.Default(ctx)
+	userEmail := session.Get(configuration.SessionKeyUser)
+	if userEmail == nil {
+		return "", errors.New("user email not found in session")
+	}
+
+	// Преобразуем userEmail в строку
+	userEmailStr, ok := userEmail.(string)
+	if !ok {
+		return "", errors.New("user email in session is not of type string")
+	}
+
+	return userEmailStr, nil
 }

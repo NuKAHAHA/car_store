@@ -11,12 +11,14 @@ import (
 )
 
 type CarService struct {
-	CarRepository *repository.CarRepository
+	CarRepository  *repository.CarRepository
+	UserRepository *repository.UserRepository
 }
 
-func NewCarService(carRepository *repository.CarRepository) *CarService {
+func NewCarService(carRepository *repository.CarRepository, userRepository *repository.UserRepository) *CarService {
 	return &CarService{
-		CarRepository: carRepository,
+		CarRepository:  carRepository,
+		UserRepository: userRepository,
 	}
 }
 
@@ -59,4 +61,13 @@ func (cs *CarService) UpdateCar(car *model.Car) error {
 
 func (cs *CarService) DeleteCar(carID string) error {
 	return cs.CarRepository.DeleteCar(carID)
+}
+
+func (s *CarService) GetCarsByUserEmail(email string) ([]model.Car, error) {
+	user, err := s.UserRepository.GetByFieldMail(email)
+	if err != nil {
+		return nil, err
+	}
+
+	return s.CarRepository.GetCarsByUserID(user.ID.Hex())
 }

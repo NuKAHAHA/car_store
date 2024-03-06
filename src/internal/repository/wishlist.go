@@ -27,7 +27,7 @@ func (r *WishlistRepository) AddToWishlist(wishlist *model.Wishlist) error {
 
 func (r *WishlistRepository) RemoveFromWishlist(userID, carID string) error {
 	filter := bson.M{"user_id": userID, "car_id": carID}
-	result, err := r.Collection.DeleteOne(context.TODO(), filter)
+	result, err := r.Collection.DeleteOne(context.Background(), bson.M{"_id": filter})
 	if err != nil {
 		return err
 	}

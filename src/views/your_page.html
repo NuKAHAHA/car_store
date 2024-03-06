@@ -1,0 +1,42 @@
+{{define "content"}}
+<h1>Cars Page</h1>
+<p>This is a page to display cars.</p>
+
+<!-- Вывод информации о пользователе -->
+<!--<div class="user-info">-->
+<!--    <h2>User Information</h2>-->
+<!--    <p>Email: {{ .User.Email }}</p>-->
+<!--    <p>Name: {{ .User.FirstName }} {{ .User.LastName }}</p>-->
+<!--</div>-->
+
+{{range .Cars}}
+<div class="car-container" data-car-id="{{.ID}}">
+    <h2>{{.Brand}} {{.Model_Car}}</h2>
+    <p>Year: {{.Year}}, Cost: ${{.Cost}}</p>
+    <p>Description: {{.Description}}</p>
+
+    <!-- Используем ID пользователя и ID машины в форме -->
+    <form action="/wishlist/{{ $.User.ID }}/add/{{.ID}}" method="post">
+        <button type="submit">Add to Wishlist</button>
+    </form>
+
+    <!-- Добавлено: ссылка для редактирования и форма для удаления -->
+    <a href="/cars/{{.ID.Hex}}/edit">Edit</a>
+    <form id="deleteForm-{{.ID.Hex}}" action="/cars/{{.ID.Hex}}/delete" method="post">
+        <button type="button" onclick="deleteCar('{{.ID.Hex}}')">Delete</button>
+    </form>
+
+    <hr>
+</div>
+<script>
+    function deleteCar(carID) {
+        var confirmation = confirm("Are you sure you want to delete this car?");
+        if (confirmation) {
+            var form = document.getElementById("deleteForm-" + carID);
+            form.submit();
+        }
+    }
+</script>
+{{end}}
+
+{{end}}

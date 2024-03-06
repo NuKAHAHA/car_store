@@ -1,0 +1,23 @@
+{{define "content"}}
+<h1>Cars Page</h1>
+<p>This is a page here you can to add.</p>
+
+<form action="/cars_post" method="post" enctype="multipart/form-data">
+    <input type="hidden" name="user_id" id="user_id" value="{{ .UserID }}">
+    <label for="model">Model:</label>
+    <input type="text" id="model" name="model" required>
+    <label for="year">Year:</label>
+    <input type="number" id="year" name="year" required>
+    <label for="cost">Cost:</label>
+    <input type="number" id="cost" name="cost" step="0.01" required>
+    <label for="description">Description:</label>
+    <input type="text" id="description" name="description">
+    <label for="image">Image:</label>
+    <input type="text" id="image" name="image">
+    <label for="brand">Brand:</label>
+    <input type="text" id="brand" name="brand" required>
+    <button type="submit">Add Car</button>
+</form>
+
+
+{{end}}

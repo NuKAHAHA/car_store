@@ -17,12 +17,14 @@ import (
 )
 
 type CarController struct {
-	carService *service.CarService
+	carService  *service.CarService
+	userService *service.AuthService
 }
 
-func NewCarController(carService *service.CarService) *CarController {
+func NewCarController(carService *service.CarService, userService *service.AuthService) *CarController {
 	return &CarController{
-		carService: carService,
+		carService:  carService,
+		userService: userService,
 	}
 }
 
@@ -39,6 +41,19 @@ func (cc *CarController) GetAllCars(ctx *gin.Context) {
 	})
 }
 
+func (cc *CarController) PostCarPage(ctx *gin.Context) {
+	cars, err := cc.carService.GetAllCars()
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Error fetching cars"})
+		return
+	}
+
+	ginview.HTML(ctx, http.StatusOK, "post", gin.H{
+		"title": "Posting cars",
+		"Cars":  cars,
+	})
+}
+
 func (cc *CarController) PostCar(ctx *gin.Context) {
 
 	carRequest := &request.CarRequest{
@@ -50,7 +65,7 @@ func (cc *CarController) PostCar(ctx *gin.Context) {
 		Brand:       ctx.PostForm("brand"),
 	}
 
-	ctx.BindWith(carRequest, binding.FormPost)
+	ctx.MustBindWith(carRequest, binding.FormPost)
 
 	var err error
 
@@ -107,7 +122,7 @@ func (cc *CarController) UpdateCar(ctx *gin.Context) {
 		Image:       ctx.PostForm("image"),
 		Brand:       ctx.PostForm("brand"),
 	}
-	ctx.BindWith(updatedCarRequest, binding.FormPost)
+	ctx.MustBindWith(updatedCarRequest, binding.FormPost)
 
 	updatedCar := &model.Car{
 		Model_Car:   updatedCarRequest.Model_Car,
@@ -158,5 +173,27 @@ func (cc *CarController) GetCarByID(ctx *gin.Context) {
 	ginview.HTML(ctx, http.StatusOK, "edit_car", gin.H{
 		"title": "Car Details",
 		"Car":   car,
+	})
+}
+
+func (cc *CarController) CarsPageHandler(ctx *gin.Context) {
+	email, err := GetUserEmail(ctx) // Замените на получение Email из вашего контекста или запроса
+	cars, err := cc.carService.GetCarsByUserEmail(email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	user, err := cc.userService.GetByFieldMail(email)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Отправьте данные в ваш HTML-шаблон
+	ctx.HTML(http.StatusOK, "your_page", gin.H{
+		"title": "Cars Page",
+		"User":  user,
+		"Cars":  cars,
 	})
 }

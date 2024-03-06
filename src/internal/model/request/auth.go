@@ -14,4 +14,6 @@ type RegisterRequest struct {
 	Name            string    `json:"name"`
 	Surname         string    `json:"surname"`
 	Birthday        time.Time `json:"birthday"`
+
+	Wishlist []Wishlist `json:"wishlist" bson:"wishlist"`
 }
