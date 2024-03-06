@@ -27,3 +27,15 @@ func NewConfiguration() (*Configuration, error) {
 
 	return configuration, nil
 }
+
+func (c *Configuration) GetMongoDBURI() string {
+	return *c.DatabaseConfiguration.ConnectionURI
+}
+
+func (c *Configuration) GetMongoDBName() string {
+	return *c.SessionConfiguration.MongoDBName
+}
+
+func (c *Configuration) GetMongoDBCollectionName() string {
+	return *c.SessionConfiguration.CollectionName
+}

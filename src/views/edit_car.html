@@ -1,0 +1,20 @@
+{{define "content"}}
+
+    <h1>Edit Car</h1>
+    <form action="/cars/{{.Car.ID.Hex}}/edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="user_id" value="{{ .UserID }}">
+        <label for="model_car">Model:</label>
+        <input type="text" id="model_car" name="model_car" value="{{ .Car.Model_Car }}" required>
+        <label for="year">Year:</label>
+        <input type="number" id="year" name="year" value="{{ .Car.Year }}" required>
+        <label for="cost">Cost:</label>
+        <input type="number" id="cost" name="cost" step="0.01" value="{{ .Car.Cost }}" required>
+        <label for="description">Description:</label>
+        <input type="text" id="description" name="description" value="{{ .Car.Description }}">
+        <label for="image">Image:</label>
+        <input type="text" id="image" name="image">
+        <label for="brand">Brand:</label>
+        <input type="text" id="brand" name="brand" value="{{ .Car.Brand }}" required>
+        <button type="submit">Update Car</button>
+    </form>
+{{end}}

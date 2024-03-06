@@ -1,40 +1,54 @@
 package repository
 
 import (
-	"gorm.io/gorm"
+	"context"
+
+	"go.mongodb.org/mongo-driver/bson"
+
+	"go.mongodb.org/mongo-driver/mongo"
+
+	// "go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/nukahaha/car_store/src/internal/model"
 )
 
 type UserRepository struct {
-	Database *gorm.DB
+	Collection *mongo.Collection
 }
 
-func NewUserRepository(database *Database) (*UserRepository, error) {
-	err := database.Gorm.AutoMigrate(&model.User{})
-	if err != nil {
-		return nil, err
-	}
+func NewUserRepository(database *mongo.Database, collectionName string) *UserRepository {
+	collection := database.Collection(collectionName)
 
 	return &UserRepository{
-		Database: database.Gorm,
-	}, nil
+		Collection: collection,
+	}
 }
 
-func (lr *UserRepository) Register(user *model.User) error {
-	if db := lr.Database.Create(&user); db.Error != nil {
-		return db.Error
+func (ur *UserRepository) Register(user *model.User) error {
+	_, err := ur.Collection.InsertOne(context.Background(), user)
+	if err != nil {
+		return err
 	}
-
 	return nil
 }
 
-func (lr *UserRepository) GetByFieldMail(mail string) (*model.User, error) {
+func (ur *UserRepository) GetByFieldMail(mail string) (*model.User, error) {
 	var user model.User
+	filter := bson.M{"mail": mail}
+	err := ur.Collection.FindOne(context.Background(), filter).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}
 
-	db := lr.Database.Where("mail = ?", mail).First(&user)
-	if db.Error != nil {
-		return nil, db.Error
+func (ur *UserRepository) GetUserByID(id string) (*model.User, error) {
+	filter := bson.M{"_id": id}
+
+	var user model.User
+	err := ur.Collection.FindOne(context.Background(), filter).Decode(&user)
+	if err != nil {
+		return nil, err
 	}
 
 	return &user, nil

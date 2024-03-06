@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -158,4 +159,21 @@ func (ac *AuthController) GetLogout(ctx *gin.Context) {
 	}
 
 	ctx.Redirect(http.StatusTemporaryRedirect, "/")
+
+}
+
+func GetUserID(ctx *gin.Context) (string, error) {
+	session := sessions.Default(ctx)
+	userID := session.Get(configuration.SessionKeyUser)
+	if userID == nil {
+		return "0", errors.New("user ID not found in session")
+	}
+
+	// Преобразуем userID в uint
+	userIDUint, ok := userID.(string)
+	if !ok {
+		return "0", errors.New("user ID in session is not of type uint")
+	}
+
+	return userIDUint, nil
 }

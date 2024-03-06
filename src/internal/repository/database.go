@@ -1,23 +1,25 @@
 package repository
 
 import (
-	"fmt"
+	"context"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"time"
+
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/nukahaha/car_store/src/internal/configuration"
 )
 
 type Database struct {
-	Gorm *gorm.DB
+	Mongo *mongo.Client
 }
 
 func NewDatabase(databaseConfiguration *configuration.DatabaseConfiguration) (*Database, error) {
 	db := &Database{}
 	var err error
 
-	db.Gorm, err = db.runPostgresql(databaseConfiguration)
+	db.Mongo, err = db.connectToMongoDB(databaseConfiguration)
 	if err != nil {
 		return nil, err
 	}
@@ -26,28 +28,32 @@ func NewDatabase(databaseConfiguration *configuration.DatabaseConfiguration) (*D
 }
 
 func (d *Database) Close() error {
-	sqlDB, err := d.Gorm.DB()
-	if err != nil {
-		return err
-	}
-
-	err = sqlDB.Close()
-	if err != nil {
-		return err
+	if d.Mongo != nil {
+		err := d.Mongo.Disconnect(context.Background())
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
 }
 
-func (d *Database) runPostgresql(databaseConfiguration *configuration.DatabaseConfiguration) (*gorm.DB, error) {
-	connectionString := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
-		*databaseConfiguration.Host, *databaseConfiguration.Username, *databaseConfiguration.Password,
-		*databaseConfiguration.DatabaseName, *databaseConfiguration.Port)
+func (d *Database) connectToMongoDB(databaseConfiguration *configuration.DatabaseConfiguration) (*mongo.Client, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
-	db, err := gorm.Open(postgres.Open(connectionString), &gorm.Config{})
+	uri := *databaseConfiguration.ConnectionURI
+	clientOptions := options.Client().ApplyURI(uri)
+
+	client, err := mongo.Connect(ctx, clientOptions)
 	if err != nil {
 		return nil, err
 	}
 
-	return db, nil
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return client, nil
 }

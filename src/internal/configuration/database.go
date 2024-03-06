@@ -7,41 +7,23 @@ import (
 )
 
 type DatabaseConfiguration struct {
-	Host         *string `yaml:"host" json:"host"`
-	Port         *string `yaml:"port" json:"port"`
-	DatabaseName *string `yaml:"databaseName" json:"databaseName"`
-	Username     *string `yaml:"username" json:"username"`
-	Password     *string `yaml:"password" json:"password"`
+	ConnectionURI *string `yaml:"connectionURI" json:"connectionURI"`
 }
 
 func (dc DatabaseConfiguration) Validate() error {
 	return validation.ValidateStruct(&dc,
-		validation.Field(&dc.Host, validation.NilOrNotEmpty),
-		validation.Field(&dc.Port, validation.NilOrNotEmpty),
-		validation.Field(&dc.DatabaseName, validation.NilOrNotEmpty),
-		validation.Field(&dc.Username, validation.NilOrNotEmpty),
-		validation.Field(&dc.Password, validation.NilOrNotEmpty),
+		validation.Field(&dc.ConnectionURI, validation.NilOrNotEmpty),
 	)
 }
 
-func newDatabaseConfiguration(host *string, port *string, databaseName *string, username *string, password *string) *DatabaseConfiguration {
+func newDatabaseConfiguration(connectionURI *string) *DatabaseConfiguration {
 	return &DatabaseConfiguration{
-		Host:         host,
-		Port:         port,
-		DatabaseName: databaseName,
-		Username:     username,
-		Password:     password,
+		ConnectionURI: connectionURI,
 	}
 }
 
-//zhani one love == true,,
-
 func GetDatabaseConfiguration() *DatabaseConfiguration {
-	host := flag.String("db-host", "localhost", "postgres database host")
-	port := flag.String("db-port", "5432", "postgres database port")
-	name := flag.String("db-name", "car_store_db", "postgres database name")
-	username := flag.String("db-username", "postgres", "postgres database username")
-	password := flag.String("db-password", "0000", "postgres database password")
+	connectionURI := flag.String("db-connection-uri", "mongodb+srv://kukaNku:kuka0404@cluster0.nkjmlah.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0", "MongoDB connection URI")
 
-	return newDatabaseConfiguration(host, port, name, username, password)
+	return newDatabaseConfiguration(connectionURI)
 }

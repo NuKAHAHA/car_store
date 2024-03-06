@@ -1,12 +1,16 @@
 package main
 
 import (
+	"context"
 	"log"
+	"time"
 
 	"github.com/foolin/goview"
 	"github.com/foolin/goview/supports/ginview"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/nukahaha/car_store/src/internal/configuration"
 	"github.com/nukahaha/car_store/src/internal/controller"
@@ -15,7 +19,6 @@ import (
 	"github.com/nukahaha/car_store/src/internal/service"
 )
 
-// pussy
 func main() {
 	appConfiguration, err := configuration.NewConfiguration()
 	if err != nil {
@@ -29,7 +32,7 @@ func main() {
 		Extension: ".html",
 		Master:    "layouts/main",
 	})
-	//
+
 	engine.Static("/public", "./public")
 
 	database, err := setDatabaseConnection(appConfiguration)
@@ -39,7 +42,7 @@ func main() {
 
 	err = initAPI(appConfiguration, engine, database)
 	if err != nil {
-		log.Fatal("Couldn't init routes, middlewares or other systems;\n", err.Error())
+		log.Fatal("Couldn't init routes, middlewares, or other systems;\n", err.Error())
 	}
 
 	err = engine.Run()
@@ -54,19 +57,26 @@ func main() {
 }
 
 func initAPI(appConfiguration *configuration.Configuration, engine *gin.Engine, database *repository.Database) error {
-	// Create Repositories
-	userRepository, err := repository.NewUserRepository(database)
-
+	client, err := setMongoDBConnection(appConfiguration)
 	if err != nil {
 		return err
 	}
-	//zh
+
+	// Create Repositories
+	userRepository := repository.NewUserRepository(client, "users")
+	wishlistRepository := repository.NewWishlistRepository(client, "wishlists")
+	carRepository := repository.NewCarRepository(client, "car")
+
 	// Create Services
 	authService := service.NewAuthService(userRepository)
+	wishlistService := service.NewWishlistService(wishlistRepository, carRepository)
+	carService := service.NewCarService(carRepository)
 
 	// Create Controllers
 	homeController := controller.NewHomeController()
 	authController := controller.NewAuthController(authService)
+	wishlistController := controller.NewWishlistController(wishlistService)
+	carController := controller.NewCarController(carService)
 
 	// Middlewares
 	engine.Use(setSession(appConfiguration))
@@ -83,12 +93,45 @@ func initAPI(appConfiguration *configuration.Configuration, engine *gin.Engine, 
 	authorized.GET("/", homeController.GetHome)
 	authorized.GET("/logout", authController.GetLogout)
 
+	authorized.GET("/cars", carController.GetAllCars)
+	authorized.POST("/cars", carController.PostCar)
+
+	authorized.GET("/cars/:id/edit", carController.GetCarByID)
+	authorized.POST("/cars/:id/edit", carController.UpdateCar)
+	authorized.POST("/cars/:id/delete", carController.DeleteCar)
+
+	wishlistGroup := authorized.Group("/wishlist")
+	{
+		wishlistGroup.POST("/:userID/add/:carID", wishlistController.AddToWishlistHandler)
+		wishlistGroup.DELETE("/:userID/remove/:carID", wishlistController.RemoveFromWishlistHandler)
+		wishlistGroup.GET("", wishlistController.GetWishlistHandler)
+	}
 	return nil
 }
 
-func setDatabaseConnection(appConfiguration *configuration.Configuration) (*repository.Database, error) {
-	database, err := repository.NewDatabase(appConfiguration.DatabaseConfiguration)
+func setMongoDBConnection(appConfiguration *configuration.Configuration) (*mongo.Database, error) {
+	clientOptions := options.Client().ApplyURI(*appConfiguration.DatabaseConfiguration.ConnectionURI)
+	client, err := mongo.NewClient(clientOptions)
+	if err != nil {
+		return nil, err
+	}
 
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+
+	err = client.Connect(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	database := client.Database("your_database_name") // Replace with your actual database name
+
+	return database, nil
+}
+
+func setDatabaseConnection(appConfiguration *configuration.Configuration) (*repository.Database, error) {
+	// If you're still using Gorm for something else, you can replace this with your Gorm initialization
+	database, err := repository.NewDatabase(appConfiguration.DatabaseConfiguration)
 	if err != nil {
 		return nil, err
 	}

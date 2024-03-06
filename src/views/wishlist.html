@@ -1,0 +1,22 @@
+{{define "content"}}
+<h1>Wishlist Page</h1>
+<p>This is a wishlist page. You can add and remove cars from your wishlist.</p>
+
+<h2>Your Wishlist</h2>
+<p>Debugging Information:</p>
+<pre>{{ .Cars | printf "%#v" }}</pre>
+
+<h3>Wishlist Items:</h3>
+<ul>
+    {{range .Cars}}
+    <li>
+        {{ .Brand }} {{ .Model_Car }} ({{ .Year }}) - ${{ .Cost }}
+        <form action="/wishlist/{{ .CarID }}/remove" method="post">
+            <button type="submit">Remove Car from Wishlist</button>
+        </form>
+    </li>
+    {{else}}
+    <li>No cars in the wishlist</li>
+    {{end}}
+</ul>
+{{end}}
