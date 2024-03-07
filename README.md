@@ -8,9 +8,7 @@ Build and run `src/cmd/main.go`
 `-db-password` must be provided to run!
 
 # Participants
-Zhaniya Zhakipova
-Khamzin Amir
-Nurdaulet Khaimuldin
+Zhaniya Zhakipova,Amir Khamzin,Nurdaulet Khaimuldin
 
 # Overview
 The project "KukaNkuAmr" aims to establish an innovative car store that caters to
