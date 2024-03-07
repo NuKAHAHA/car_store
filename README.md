@@ -21,42 +21,42 @@ HTML & CSS JavaScript Bootstrap jQuery
 
 # Project features:
 ## Main Functionality
-### HTML Rendering: 
+## HTML Rendering: 
 Utilizes goview for HTML rendering with support for Go's native HTML templates.
-### Static File Serving: 
+## Static File Serving: 
 Serves static files such as CSS and JavaScript through the /public route.
-### Database Connection: 
+## Database Connection: 
 Establishes a connection to MongoDB using the go.mongodb.org/mongo-driver package.
-### Session Management: 
+## Session Management: 
 Implements session management using gincontrib/sessions.
 ## Initialization
-###  Configuration: 
+##  Configuration: 
 Loads project configuration settings using the configuration package.
-### API Initialization:
+## API Initialization:
 Initializes the Gin router and API endpoints.
-### MongoDB Connection:
+## MongoDB Connection:
 Sets up a connection to MongoDB and creates necessary repositories.
 ## Components
-### Repositories:
+## Repositories:
 Implements repositories for interacting with MongoDB collections (users, wishlists, cars).
-### Services:
+## Services:
 Defines services for business logic handling (authentication, wishlist, car).
-### Controllers:
+## Controllers:
 Creates controllers for handling HTTP requests and responses.
 ## Routes
-### Authentication Routes:
+## Authentication Routes:
 Handles user authentication and registration through /login and /register endpoints.
-### Homepage Routes: 
+## Homepage Routes: 
 Serves the homepage and logout functionality for authenticated users.
-### Car Routes: 
+## Car Routes: 
 Manages CRUD operations for cars including listing, adding, editing, and deleting.
-### Wishlist Routes:
+## Wishlist Routes:
 Facilitates wishlist management for users including adding and removing cars from the wishlist.
 ## Middleware
-### Session Middleware:
+## Session Middleware:
 Utilizes session middleware for managing user sessions and authentication.
 ## Design
-### Bootstrap: 
+## Bootstrap: 
 Implements responsive design and layout using Bootstrap for enhanced user experience across different devices.
-### JavaScript: 
+## JavaScript: 
 Utilizes JavaScript for dynamic content updates, form validation, and user interaction enhancements.
