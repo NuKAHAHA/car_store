@@ -32,9 +32,10 @@ Implements session management using gincontrib/sessions.
 ## Initialization
 ###  Configuration: 
 Loads project configuration settings using the configuration package.
-### API Initialization: Initializes the Gin router and API endpoints.
-### MongoDB Connection: Sets up a connection to MongoDB and creates 
-necessary repositories.
+### API Initialization:
+Initializes the Gin router and API endpoints.
+### MongoDB Connection:
+Sets up a connection to MongoDB and creates necessary repositories.
 ## Components
 ### Repositories:
 Implements repositories for interacting with MongoDB collections (users, wishlists, cars).
