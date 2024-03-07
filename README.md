@@ -5,7 +5,6 @@ Car Store is an online store application for selling and buying cars.
 ## Usage
 
 Build and run `src/cmd/main.go`
-`-db-password` must be provided to run!
 
 # Participants
 Zhaniya Zhakipova,Amir Khamzin,Nurdaulet Khaimuldin
